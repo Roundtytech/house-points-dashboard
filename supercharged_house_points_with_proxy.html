@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supercharged House Points Dashboard</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      height: 100vh;
+      gap: 10px;
+    }
+    .house {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      background-color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+      animation: pulseSpin 10s infinite ease-in-out;
+    }
+    .house img {
+      height: 180px;
+      transition: transform 0.5s ease;
+      animation: logoCycle 20s infinite ease-in-out;
+    }
+    .house h2 {
+      margin: 10px 0 5px;
+    }
+    .points {
+      font-size: 2.8em;
+      color: #333;
+    }
+
+    @keyframes logoCycle {
+      0%   { transform: scale(1) rotate(0deg); }
+      25%  { transform: scale(1.1) rotate(10deg); }
+      50%  { transform: scale(1.25) rotate(0deg); }
+      75%  { transform: scale(1.1) rotate(-10deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="house" id="aroha">
+    <img src="https://www.dropbox.com/scl/fi/qdx6rcos4b3e31cdu70cb/Aroha.png?rlkey=989stljtr16jk21fvgrtr6y12&st=4c1inpd7&dl=1" alt="Aroha Logo">
+    <h2>Aroha</h2>
+    <div class="points" id="points-aroha">Loading...</div>
+  </div>
+  <div class="house" id="ausdauer">
+    <img src="https://www.dropbox.com/scl/fi/hvy06yytst55hyfwc2n5v/Ausdauer.png?rlkey=3a77j4jt7op3tegq2rsm3cw2c&st=qezv8oae&dl=1" alt="Ausdauer Logo">
+    <h2>Ausdauer</h2>
+    <div class="points" id="points-ausdauer">Loading...</div>
+  </div>
+  <div class="house" id="fidelis">
+    <img src="https://www.dropbox.com/scl/fi/841jlojg98e7n53vnsk57/Fidelis.png?rlkey=3y118itt8y50iprdz2ae7myyg&st=16rfi2xb&dl=1" alt="Fidelis Logo">
+    <h2>Fidelis</h2>
+    <div class="points" id="points-fidelis">Loading...</div>
+  </div>
+  <div class="house" id="isibindi">
+    <img src="https://www.dropbox.com/scl/fi/oqdgpm1c002alot8o1a6p/Isibindi.png?rlkey=38jt4ro3q1o53pn127ynvhucn&st=wwt95txk&dl=1" alt="Isibindi Logo">
+    <h2>Isibindi</h2>
+    <div class="points" id="points-isibindi">Loading...</div>
+  </div>
+
+  <script>
+    async function fetchSheetData() {
+      try {
+        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0nPiFV37j3yPs1KlRmLJrTK_68qMQYpXE903Y2QM8mczDyvWCC9p5jPAh2aXwRjfwO3iLr567hYkY/pub?gid=278819802&single=true&output=csv";
+        const response = await fetch(proxyUrl + sheetUrl);
+        const text = await response.text();
+        const rows = text.trim().split('\n').map(row => row.split(','));
+
+        const houseTotals = {
+          'Aroha': 0,
+          'Ausdauer': 0,
+          'Fidelis': 0,
+          'Isibindi': 0
+        };
+
+        rows.forEach(([house, points]) => {
+          if (house in houseTotals) {
+            houseTotals[house] = points;
+          }
+        });
+
+        for (const [house, points] of Object.entries(houseTotals)) {
+          document.getElementById(`points-${house.toLowerCase()}`).innerText = points;
+        }
+      } catch (error) {
+        console.error('Error fetching or parsing Google Sheet data:', error);
+      }
+    }
+
+    fetchSheetData();
+    setInterval(fetchSheetData, 30000);
+  </script>
+</body>
+</html>
